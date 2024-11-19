@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflight_project/views/notes_details_screen.dart';
 
@@ -25,8 +26,72 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void getNotes() async {
-    allnotes = await dbRef!.getAllNotes();
+    var notes = await dbRef!.getAllNotes();
+    allnotes = List.from(notes); // Ensure `allnotes` is mutable
     setState(() {});
+  }
+
+  void showIOSActionSheet({
+    required BuildContext context,
+    required int index,
+    required Map<String, dynamic> deletedNote,
+  }) {
+    showAdaptiveDialog(
+      context: context,
+      builder: (ctx) => CupertinoActionSheet(
+        title: const Text('Delete Note'),
+        message: const Text(
+            'Are you sure you want to delete this note? This action cannot be undone.'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.pop(ctx);
+
+              // Temporarily remove the note
+              setState(() {
+                allnotes.removeAt(index);
+              });
+
+              // Show SnackBar with Undo option
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Note deleted'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      setState(() {
+                        allnotes.insert(index, deletedNote);
+                      });
+                    },
+                  ),
+                  duration: const Duration(seconds: 5),
+                ),
+              );
+
+              // Wait 5 seconds to confirm deletion if not undone
+              await Future.delayed(const Duration(seconds: 5));
+              if (!allnotes.contains(deletedNote)) {
+                await dbRef!.deleteNote(
+                  sno: deletedNote[DBHelper.column_note_sr_no],
+                );
+              }
+            },
+            isDestructiveAction: true,
+            child: const Text('Delete'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(ctx); // Close the action sheet
+              setState(() {
+                // Restore the note if canceled
+                allnotes.insert(index, deletedNote);
+              });
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -65,9 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Dismissible(
-                    key: ValueKey(
-                      allnotes[index][DBHelper.column_note_sr_no],
-                    ),
+                    key: ValueKey(allnotes[index][DBHelper.column_note_sr_no]),
                     background: Container(
                       height: 100,
                       width: double.infinity,
@@ -75,54 +138,29 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(10),
                       ),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
-                    confirmDismiss: (direction) async {
-                      return await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('Delete Note'),
-                          content: const Text(
-                              'Are you sure you want to delete this note? This action cannot be undone.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(ctx).pop(false); // Cancel deletion
-                              },
-                              child: const Text('No'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(ctx).pop(true); // Confirm deletion
-                              },
-                              child: const Text('Yes'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    onDismissed: (direction) async {
+                    onDismissed: (_) {
                       final deletedNote = allnotes[index];
-                      await dbRef!.deleteNote(
-                        sno: deletedNote[DBHelper.column_note_sr_no],
-                      );
-
                       setState(() {
-                        allnotes.removeAt(index);
+                        allnotes
+                            .removeAt(index); // Safe as the list is now mutable
                       });
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Note deleted successfully'),
-                          duration: Duration(seconds: 2),
-                        ),
+                      showIOSActionSheet(
+                        context: context,
+                        index: index,
+                        deletedNote: deletedNote,
                       );
                     },
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: primaryColor,
                         child: Text(
-                          allnotes[index][DBHelper.column_note_sr_no]
-                              .toString(),
+                          '${index + 1}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -237,10 +275,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       noteTitle: titleController.text,
                       noteDesc: desController.text,
                     );
-                    titleController.clear();
-                    desController.clear();
                     getNotes();
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close modal after adding
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 14),
@@ -262,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close modal on cancel
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 14),
