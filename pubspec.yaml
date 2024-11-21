@@ -92,6 +92,9 @@ flutter:
     - family: GaMaamli
       fonts:
         - asset: assets/fonts/GaMaamli-Regular.ttf
+    - family: sanSarif
+      fonts:
+        - asset: assets/fonts/OpenSans-VariableFont_wdth.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #

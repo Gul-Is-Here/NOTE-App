@@ -78,7 +78,7 @@ class NotesDetailsScreen extends StatelessWidget {
                     const Text(
                       'Title',
                       style: TextStyle(
-                        fontFamily: cormo,
+                        fontFamily: sanSarif,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -90,7 +90,7 @@ class NotesDetailsScreen extends StatelessWidget {
                         border: UnderlineInputBorder(),
                       ),
                       style: const TextStyle(
-                        fontFamily: cormo,
+                        fontFamily: sanSarif,
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
                       ),
@@ -109,7 +109,7 @@ class NotesDetailsScreen extends StatelessWidget {
                     const Text(
                       'Description',
                       style: TextStyle(
-                        fontFamily: cormo,
+                        fontFamily: sanSarif,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -122,7 +122,7 @@ class NotesDetailsScreen extends StatelessWidget {
                         border: UnderlineInputBorder(),
                       ),
                       style: const TextStyle(
-                        fontFamily: cormo,
+                        fontFamily: sanSarif,
                         fontWeight: FontWeight.w400,
                         fontSize: 16,
                       ),
@@ -145,7 +145,7 @@ class NotesDetailsScreen extends StatelessWidget {
         label: const Text(
           'Share Note',
           style: TextStyle(
-              fontFamily: cormo,
+              fontFamily: sanSarif,
               fontWeight: FontWeight.bold,
               color: Colors.white),
         ),

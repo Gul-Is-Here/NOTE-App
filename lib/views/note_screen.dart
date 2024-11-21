@@ -190,8 +190,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text(
                           '${index + 1}',
                           style: TextStyle(
-                            fontFamily: cormo,
-                            color: Colors.white,
+                            fontFamily: sanSarif,
+                            color: secondaryColor,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -200,14 +201,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         allnotes[index][DBHelper.column_note_title],
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: cormo,
+                          fontFamily: sanSarif,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(
                         allnotes[index][DBHelper.column_note_desc],
                         style: TextStyle(
-                          fontFamily: cormo,
+                          fontFamily: sanSarif,
                           fontSize: 14,
                           color: Colors.grey[600],
                         ),
